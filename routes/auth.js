@@ -1,8 +1,11 @@
 const route = require("express").Router();
 const jwt = require("jsonwebtoken");
+const Argon2 = require("argon2");
+const Speakeasy = require("speakeasy");
 const User = require("../models").User;
 const validate = require("./modules/validation");
-const argon2 = require("argon2");
+const modules = require("./modules");
+const jwt_secret = process.env.JWT_SECRET;
 
 route.post("/register", async (req, res) => {
   const validation = validate.registerValidation(req.body);
@@ -15,14 +18,13 @@ route.post("/register", async (req, res) => {
   if (unique_username || unique_email)
     return res.status(406).json({ error: `Username or Email already exist!` });
 
-  const hashPass = await argon2.hash(password);
+  const hashPass = await Argon2.hash(password);
   const user = await new User({
     name,
     email,
     username,
     password: hashPass,
   });
-
   try {
     const newUser = await user.save();
     res.status(201).json({
@@ -35,4 +37,80 @@ route.post("/register", async (req, res) => {
   }
 });
 
+route.post("/login", async (req, res) => {
+  let validation = validate.loginValidation(req.body);
+  if (validation.error)
+    return res.status(400).json({ msg: validation.error.details[0].message });
+  const { username, password } = req.body;
+  try {
+    let checkUser = await User.findOne({ username });
+    if (!checkUser)
+      return res
+        .status(400)
+        .json({ msg: "Incorrect username/password, please check." });
+    let checkPass = await Argon2.verify(checkUser.password, password);
+    if (!checkPass)
+      return res
+        .status(400)
+        .json({ msg: "Incorrect username/password, please check" });
+    if (checkUser.otp_secret) {
+      let token = Speakeasy.totp({
+        secret: checkUser.otp_secret,
+        encoding: "base32",
+      });
+      modules.NodeMailer({ reciepient: checkUser.email, otp: token });
+    }
+    let jwt_token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        username,
+        password,
+      },
+      jwt_secret
+    );
+    res.status(200).json({
+      jwt_token,
+      userInfo: {
+        name: checkUser.name,
+        email: checkUser.email,
+        id: checkUser.id,
+        otp_enabled: checkUser.otp_enabled
+      },
+    });
+  } catch (e) {
+    res.status(400).json({ msg: e.message });
+  }
+});
+
+route.patch("/manage_otp/:id", findUser, async (req, res) => {
+  const otp_secret = Speakeasy.generateSecret({
+    length: 20,
+  });
+  if (res.user.otp_secret) {
+    res.user.otp_secret = "";
+    res.user.otp_enabled = false;
+  } else {
+    res.user.otp_enabled = true;
+    res.user.otp_secret = otp_secret.base32;
+  }
+
+  try {
+    const updatedUser = res.user.save();
+    res.json("Profile updated!");
+  } catch (e) {
+    res.status(400).json({ msg: e.message });
+  }
+});
+
+async function findUser(req, res, next) {
+  let user;
+  try {
+    user = await User.findById(req.params.id);
+    if (!user) res.status(404).json({ msg: "User not found" });
+  } catch (e) {
+    res.status(500).json({ msg: e.message });
+  }
+  res.user = user;
+  next();
+}
 module.exports = route;
