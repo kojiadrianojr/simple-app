@@ -10,7 +10,7 @@ const jwt_secret = process.env.JWT_SECRET;
 route.post("/register", async (req, res) => {
   const validation = validate.registerValidation(req.body);
   if (validation.error)
-    return res.status(400).json({ msg: validation.error.details[0].message });
+    return res.status(400).json({ validation_error: validation.error.details[0].message });
   const { name, email, username, password } = req.body;
 
   const unique_username = await User.findOne({ username: username });
@@ -40,7 +40,7 @@ route.post("/register", async (req, res) => {
 route.post("/login", async (req, res) => {
   let validation = validate.loginValidation(req.body);
   if (validation.error)
-    return res.status(400).json({ msg: validation.error.details[0].message });
+    return res.status(400).json({ validation_error: validation.error.details[0].message });
   const { username, password } = req.body;
   try {
     let checkUser = await User.findOne({ username });
@@ -99,7 +99,7 @@ route.patch("/manage_otp/:id", findUser, async (req, res) => {
 
   try {
     const updatedUser = res.user.save();
-    res.json({msg});
+    res.json({ msg });
   } catch (e) {
     res.status(400).json({ msg: e.message });
   }
