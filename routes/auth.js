@@ -74,7 +74,7 @@ route.post("/login", async (req, res) => {
         name: checkUser.name,
         email: checkUser.email,
         id: checkUser.id,
-        otp_enabled: checkUser.otp_enabled
+        otp_enabled: checkUser.otp_enabled,
       },
     });
   } catch (e) {
@@ -83,22 +83,40 @@ route.post("/login", async (req, res) => {
 });
 
 route.patch("/manage_otp/:id", findUser, async (req, res) => {
+  let msg;
   const otp_secret = Speakeasy.generateSecret({
     length: 20,
   });
   if (res.user.otp_secret) {
     res.user.otp_secret = "";
     res.user.otp_enabled = false;
+    msg = "OTP Disabled";
   } else {
     res.user.otp_enabled = true;
     res.user.otp_secret = otp_secret.base32;
+    msg = "OTP Enabled";
   }
 
   try {
     const updatedUser = res.user.save();
-    res.json("Profile updated!");
+    res.json({msg});
   } catch (e) {
     res.status(400).json({ msg: e.message });
+  }
+});
+
+route.post("/validate_otp/:id", findUser, (req, res) => {
+  const { token } = req.body;
+  try {
+    let otp_granted = Speakeasy.totp.verify({
+      secret: res.user.otp_secret,
+      encoding: "base32",
+      token: token,
+      window: 0,
+    });
+    res.send({ otp_granted });
+  } catch (e) {
+    res.json({ msg: e.message });
   }
 });
 
