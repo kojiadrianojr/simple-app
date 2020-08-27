@@ -25,6 +25,9 @@ let UserSchema = new mongoose.Schema({
     min: 6,
     max: 255,
   },
+  otp_enabled: {
+    type: Boolean,
+  },
   otp_secret: {
     type: String,
   },
