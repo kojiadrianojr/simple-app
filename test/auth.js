@@ -106,16 +106,42 @@ describe("Authentication", () => {
         });
     });
   });
-  describe("Manage OTP /auth/manage_otp/:id", () => {
+  describe("Manage OTP", () => {
     it("should manage otp of user", (done) => {
       const userId = "5f464958fdbbc202a4c15966";
       chai
         .request(server)
-        .patch('/auth/manage_otp/' + userId)
+        .patch("/auth/manage_otp/" + userId)
         .end((err, response) => {
           response.should.have.status(200);
           response.body.should.have.property("msg");
           done();
+        });
+    });
+    it("should validate otp", (done) => {
+      const userId = "5f464958fdbbc202a4c15966";
+      const user = {
+        username: "testusername",
+        password: "testpass123",
+      };
+      const token = "";
+      chai
+        .request(server)
+        .post("/auth/login")
+        .send(user)
+        .end((err, response) => {
+          if (response.body.userInfo.otp_enabled === true) {
+            return chai
+              .request(server)
+              .post("/auth/validate_otp/" + response.body.userInfo.id)
+              .send(token)
+              .end((err, response) => {
+                response.body.should.have.property("otp_granted");
+                done();
+              });
+          } else {
+            done();
+          }
         });
     });
   });
