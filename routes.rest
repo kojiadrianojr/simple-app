@@ -1,0 +1,33 @@
+GET http://localhost:3000/api/auth
+
+###
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Koji Adriano Jr",
+    "email": "iisparkplugiiog@gmail.com",
+    "username": "username00",
+    "password": "pass123",
+    "confirm_password": "pass123"
+}
+
+###
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "username00",
+    "password": "pass123"
+}
+
+###
+PATCH http://localhost:3000/api/auth/manage_otp/5f44e10c11bf2305631affd8
+
+###
+POST http://localhost:3000/api/auth/validate_otp/5f44e10c11bf2305631affd8
+Content-Type: application/json
+
+{
+    "token": "481153"
+}
