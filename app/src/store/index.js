@@ -14,8 +14,7 @@ Vue.use(Vuex);
  * with the Store instance.
  */
 
-export default function(/* { ssrContext } */) {
-  const Store = new Vuex.Store({
+export default new Vuex.Store({
     modules: {
       auth
     },
@@ -25,5 +24,5 @@ export default function(/* { ssrContext } */) {
     strict: process.env.DEV
   });
 
-  return Store;
-}
+  
+

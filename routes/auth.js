@@ -10,13 +10,13 @@ const jwt_secret = process.env.JWT_SECRET;
 route.post("/register", async (req, res) => {
   const validation = validate.registerValidation(req.body);
   if (validation.error)
-    return res.status(400).json({ validation_error: validation.error.details[0].message });
+    return res.status(400).send({ error: validation.error.details[0].message });
   const { name, email, username, password } = req.body;
 
   const unique_username = await User.findOne({ username: username });
   const unique_email = await User.findOne({ email: email });
   if (unique_username || unique_email)
-    return res.status(406).json({ error: `Username or Email already exist!` });
+    return res.status(406).send({ error: `Username or Email already exist!` });
 
   const hashPass = await Argon2.hash(password);
   const user = await new User({

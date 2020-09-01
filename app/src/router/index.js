@@ -2,7 +2,9 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import VueSVGIcon from "vue-svgicon";
 import routes from "./routes";
+import Notification from "vue-notification";
 
+Vue.use(Notification);
 Vue.use(VueSVGIcon);
 Vue.use(VueRouter);
 
@@ -15,11 +17,10 @@ Vue.use(VueRouter);
  * with the Router instance.
  */
 
-export default function(/* { store, ssrContext } */) {
+export default function() {
   const Router = new VueRouter({
     scrollBehavior: () => ({ x: 0, y: 0 }),
     routes,
-
     // Leave these as they are and change in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath

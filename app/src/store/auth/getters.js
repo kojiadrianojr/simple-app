@@ -4,5 +4,5 @@ export function someGetter (state) {
 */
 
 export function isAuth(state) {
-  state.credentials;
+  return state.credentials;
 }

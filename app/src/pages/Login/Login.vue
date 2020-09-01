@@ -8,7 +8,17 @@
       :titlename="field.name.toLowerCase()"
     />
     <q-btn-group spread>
-      <q-btn label="Login" color="primary" type="submit" />
+      <q-btn
+        :loading="config.loading"
+        :label="config.success? 'Successfully Login!':'Login'"
+        :color="config.error? 'red' : config.success?'green' :'primary'"
+        type="submit"
+        :disable="config.loading? true : false"
+      >
+        <template v-slot:loading>
+          <q-spinner-hourglass class="on-left" />Loading...
+        </template>
+      </q-btn>
     </q-btn-group>
   </q-form>
 </template>
@@ -30,6 +40,11 @@ export default {
   components: { InputFields },
   data() {
     return {
+      config: {
+        loading: false,
+        error: false,
+        success: false,
+      },
       payload: {
         username: "",
         password: "",
@@ -40,7 +55,26 @@ export default {
   methods: {
     onSubmit: async function (e) {
       e.preventDefault();
-      console.log(this.payload);
+      this.config.loading = true;
+      try {
+        let response = await this.$store.dispatch("auth/login", this.payload);
+        setTimeout(() => {
+          this.config.loading = false;
+          this.config.error = false;
+          this.config.success = true;
+          if (!this.$store.state.auth.credentials.userInfo.otp_enabled) {
+            return this.$router.history.push("/homepage");
+          }
+        }, 3000);
+        // console.log(this.$router)
+      } catch (e) {
+        console.log(e);
+        setTimeout(() => {
+          this.config.loading = false;
+          this.config.error = true;
+          this.config.success = false;
+        }, 3000);
+      }
     },
   },
 };

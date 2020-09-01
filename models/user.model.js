@@ -27,9 +27,11 @@ let UserSchema = new mongoose.Schema({
   },
   otp_enabled: {
     type: Boolean,
+
   },
   otp_secret: {
     type: String,
+
   },
 });
 
