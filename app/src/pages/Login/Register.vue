@@ -89,6 +89,7 @@ export default {
           this.config.loading = false;
           this.config.error = false;
           this.config.success = true;
+          return this.$router.history.push("/homepage");
         }, 3000);
          this.$notify({
           group: "auth",
@@ -96,6 +97,8 @@ export default {
           text: response.data.msg,
           type: "success",
         });
+
+
       } catch (e) {
         this.$notify({
           group: "auth",

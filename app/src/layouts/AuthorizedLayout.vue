@@ -7,7 +7,10 @@
           <div class="row no-wrap q-pa-md">
             <div class="column">
               <div class="text-h6 q-mb-md">Settings</div>
-              <q-toggle v-model="isTwoFactor" label="Activate 2FA" />
+              <!-- <q-form class="column items-center"> -->
+              <q-toggle v-model="isTwoFactor" label="Activate 2FA" evt />
+              <!-- <q-btn outline rounded label="Save Changes" color="primary"></q-btn> -->
+              <!-- </q-form> -->
             </div>
 
             <q-separator vertical inset class="q-mx-lg" />
@@ -47,12 +50,22 @@ export default {
   name: "AuthorizedPage",
   data() {
     return {
-      isTwoFactor: false,
+      otp_enabled: this.$store.state.auth.credentials.userInfo.otp_enabled,
       userInfo: this.$store.state.auth.credentials.userInfo,
       config: {
         loading: false,
       },
     };
+  },
+  computed: {
+    isTwoFactor: {
+      get: function () {
+        return this.otp_enabled;
+      },
+      set: function () {
+        this.otp_enabled = !this.otp_enabled;
+      },
+    },
   },
   methods: {
     handleLogout: async function () {
@@ -66,7 +79,23 @@ export default {
         setTimeout(() => {
           this.config.loading = false;
         }, 3000);
-        return this.$router.history.go('/');
+        return this.$router.history.go("/");
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    handleToggle: function () {
+      console.log(this.isTwoFactor);
+    },
+  },
+  watch: {
+    otp_enabled: async function () {
+      try {
+        let response = await this.$store.dispatch("auth/manage_otp", {
+          userId: this.$store.state.auth.credentials.userInfo.id,
+          state: this.isTwoFactor,
+        });
+        
       } catch (e) {
         console.log(e);
       }
