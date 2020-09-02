@@ -10,7 +10,9 @@ const jwt_secret = process.env.JWT_SECRET;
 route.post("/register", async (req, res) => {
   const validation = validate.registerValidation(req.body);
   if (validation.error)
-    return res.status(400).send({ error: validation.error.details[0].message });
+    return res
+      .status(400)
+      .send({ validation_error: validation.error.details[0].message });
   const { name, email, username, password } = req.body;
 
   const unique_username = await User.findOne({ username: username });
@@ -40,7 +42,9 @@ route.post("/register", async (req, res) => {
 route.post("/login", async (req, res) => {
   let validation = validate.loginValidation(req.body);
   if (validation.error)
-    return res.status(400).json({ validation_error: validation.error.details[0].message });
+    return res
+      .status(400)
+      .json({ validation_error: validation.error.details[0].message });
   const { username, password } = req.body;
   try {
     let checkUser = await User.findOne({ username });
@@ -115,6 +119,21 @@ route.post("/validate_otp/:id", findUser, (req, res) => {
       window: 0,
     });
     res.send({ otp_granted });
+  } catch (e) {
+    res.json({ msg: e.message });
+  }
+});
+
+route.get("/generate_otp/:id", modules.JWTAuth, findUser, async (req, res) => {
+  if (!res.user.otp_secret)
+    return res.status(400).json({ error: "OTP not activated" });
+  try {
+    let token = Speakeasy.totp({
+      secret: res.user.secret,
+      encoding: "base32",
+    });
+    modules.NodeMailer({ reciepient: res.user.email, otp: token });
+    return res.json({ msg: "OTP Generated!" });
   } catch (e) {
     res.json({ msg: e.message });
   }

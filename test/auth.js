@@ -108,7 +108,7 @@ describe("Authentication", () => {
   });
   describe("Manage OTP", () => {
     it("should manage otp of user", (done) => {
-      const userId = "5f464958fdbbc202a4c15966";
+      const userId = "5f4f805a53ff5602b5b45411";
       chai
         .request(server)
         .patch("/auth/manage_otp/" + userId)
@@ -143,6 +143,50 @@ describe("Authentication", () => {
             done();
           }
         });
+    });
+    it("should generate otp", (done) => {
+      const userId = "5f4e23ef9ef66301f4269d8d";
+      const token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTkwNTA3MDIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJwYXNzd29yZCI6InBhc3MxMjMiLCJpYXQiOjE1OTkwNDcxMDJ9.f7km-0BKu2x8Egmo6_se45CYO2fI-2hrW9M5LpkcdUY";
+      chai
+        .request(server)
+        .get("/auth/generate_otp/" + userId)
+        .set({
+          Authorization:
+            "bearer " + token,
+        })
+        .end((err, response) => {
+          response.body.should.have.property("msg").to.equal("OTP Generated!");
+          done();
+        });
+    });
+    it("should not generated otp to disabled 2FA", (done) => {
+      const userId = "5f4f2e3b676104002301cbcc";
+      const token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTkwNTA3MDIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJwYXNzd29yZCI6InBhc3MxMjMiLCJpYXQiOjE1OTkwNDcxMDJ9.f7km-0BKu2x8Egmo6_se45CYO2fI-2hrW9M5LpkcdUY";
+      chai
+        .request(server)
+        .get("/auth/generate_otp/" + userId)
+        .set({
+          Authorization:
+            "bearer " + token
+        })
+        .end((err, response) => {
+          response.body.should.have
+            .property("error")
+            .to.equal("OTP not activated");
+          done();
+        });
+    });
+    it("should not generate otp if no token", (done) => {
+      const userId = "5f4f2e3b676104002301cbcc";
+      chai
+      .request(server)
+      .get("/auth/generate_otp/" + userId)
+      .end((err, response) => {
+        response.should.have.status(401)
+        done();
+      })
     });
   });
 });
