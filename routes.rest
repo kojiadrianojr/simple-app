@@ -9,7 +9,7 @@ Content-Type: application/json
     "email": "iisparkplugiiog@gmail.com",
     "username": "username00",
     "password": "pass123",
-    "confirm_password": "pass123"
+    "confirm_password": "pa"
 }
 
 ###
@@ -17,12 +17,12 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "username00",
+    "username": "username",
     "password": "pass123"
 }
 
 ###
-PATCH http://localhost:3000/api/auth/manage_otp/5f44e10c11bf2305631affd8
+PATCH http://localhost:3000/api/auth/manage_otp/5f4e23ef9ef66301f4269d8d
 
 ###
 POST http://localhost:3000/api/auth/validate_otp/5f44e10c11bf2305631affd8
@@ -31,3 +31,7 @@ Content-Type: application/json
 {
     "token": "481153"
 }
+
+###
+GET http://localhost:3000/api/auth/generate_otp/5f4e23ef9ef66301f4269d8d
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTkwNTA3MDIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJwYXNzd29yZCI6InBhc3MxMjMiLCJpYXQiOjE1OTkwNDcxMDJ9.f7km-0BKu2x8Egmo6_se45CYO2fI-2hrW9M5LpkcdUY
