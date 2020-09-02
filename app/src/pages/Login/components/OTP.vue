@@ -11,14 +11,28 @@
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" @click="action" />
-          <q-btn
-            :loading="config.loading"
-            flat
-            :label="!config.success ? 'Send':''"
-            :icon="config.success? 'done': ''"
-            type="submit"
-          ></q-btn>
+          <q-btn-group>
+            <q-btn flat label="Cancel" @click="action" align="center" />
+            <q-btn
+              :loading="config.generate.loading"
+              :icon="config.generate.success? 'done': ''"
+              flat
+              :label="!config.generate.success? 'Generate new OTP': ''"
+              @click="onGenerate"
+              :color="config.generate.success? 'green':'primary'"
+              :disable="config.generate.success? true: false"
+              align="center"
+            />
+            <q-btn
+              :loading="config.loading"
+              flat
+              :color="config.success? 'green':'primary'"
+              :label="!config.success ? 'Send':''"
+              :icon="config.success? 'done': ''"
+              align="center"
+              type="submit"
+            ></q-btn>
+          </q-btn-group>
         </q-card-actions>
       </form>
     </q-card>
@@ -33,6 +47,7 @@ export default {
       //   prompt: this.state,
       otp_key: "",
       config: {
+        generate: { loading: false, success: false },
         loading: false,
         success: false,
       },
@@ -58,6 +73,36 @@ export default {
       } catch (e) {
         this.config.loading = false;
         console.log(e);
+      }
+    },
+    onGenerate: async function () {
+      try {
+        this.config.generate.loading = true;
+        let response = await this.$store.dispatch("auth/generate_otp", {
+          userId: this.$store.state.auth.credentials.userInfo.id,
+          jwt_token: this.$store.state.auth.credentials.token,
+        });
+        this.$notify({
+          group: "auth",
+          title: response.data.msg,
+          type: "success",
+        });
+        setTimeout(() => {
+          this.config.generate.loading = false;
+          this.config.generate.success = true;
+        }, 3000);
+        setTimeout(() => {
+          // this.config.generate.loading = false;
+          this.config.generate.success = false;
+        }, 6000);
+      } catch (e) {
+        this.config.generate.loading = false;
+        this.config.generate.success = false;
+        this.$notify({
+          group: "auth",
+          title: "Failed please try again",
+          type: "error"
+        })
       }
     },
   },

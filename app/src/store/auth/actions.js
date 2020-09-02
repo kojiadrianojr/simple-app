@@ -50,3 +50,10 @@ export const validate_otp = async ({ commit }, payload) => {
     return e;
   }
 };
+
+export const generate_otp = async ({commit}, payload) => {
+  try {
+    let response = await API.get(`/auth/generate_otp/${payload.userId}`, { headers: { Authorization: `bearer ${payload.jwt_token}` } });
+    return response;
+  } catch (e) { return e}
+}
