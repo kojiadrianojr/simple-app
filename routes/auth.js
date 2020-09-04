@@ -57,7 +57,7 @@ route.post("/login", async (req, res) => {
       return res
         .status(400)
         .json({ msg: "Incorrect username/password, please check" });
-    if (checkUser.otp_secret) {
+    if (checkUser.otp_enabled) {
       let token = Speakeasy.totp({
         secret: checkUser.otp_secret,
         encoding: "base32",
@@ -110,12 +110,12 @@ route.patch("/manage_otp/:id", findUser, async (req, res) => {
 });
 
 route.post("/validate_otp/:id", findUser, (req, res) => {
-  const { token } = req.body;
+  const { otp_token } = req.body;
   try {
     let otp_granted = Speakeasy.totp.verify({
       secret: res.user.otp_secret,
       encoding: "base32",
-      token: token,
+      token: otp_token,
       window: 0,
     });
     res.send({ otp_granted });
@@ -129,7 +129,7 @@ route.get("/generate_otp/:id", modules.JWTAuth, findUser, async (req, res) => {
     return res.status(400).json({ error: "OTP not activated" });
   try {
     let token = Speakeasy.totp({
-      secret: res.user.secret,
+      secret: res.user.otp_secret,
       encoding: "base32",
     });
     modules.NodeMailer({ reciepient: res.user.email, otp: token });

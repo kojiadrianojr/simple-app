@@ -16,5 +16,5 @@ export const setOtp = (state, payload) => {
 }
 
 export const validateOtp = (state, payload) => {
-  state.credentials.authenticated = true;
+  state.credentials.authenticated = payload;
 }
