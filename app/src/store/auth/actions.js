@@ -44,7 +44,7 @@ export const manage_otp = async ({ commit }, payload) => {
 export const validate_otp = async ({ commit }, payload) => {
   try {
     let response = await API.post(`/auth/validate_otp/${payload.userId}`, {otp_token: payload.otp_key});
-    commit("validateOtp")
+    commit("validateOtp", response.data.otp_granted)
     return response;
   } catch (e) {
     return e;
