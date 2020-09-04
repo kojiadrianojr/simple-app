@@ -1,7 +1,6 @@
 <template>
   <q-input
     dark
- 
     :value="value"
     @input="val => updateValue(val)"
     :label="name"

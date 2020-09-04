@@ -26,7 +26,7 @@
             <q-btn
               :loading="config.loading"
               flat
-              :color="config.success? 'green':'primary'"
+              :color="config.success? 'green':config.error? 'red':'primary'"
               :label="!config.success ? 'Send':''"
               :icon="config.success? 'done': ''"
               align="center"
@@ -57,19 +57,25 @@ export default {
   methods: {
     onSubmit: async function (e) {
       e.preventDefault();
+      this.config.loading = true;
       try {
         let response = await this.$store.dispatch("auth/validate_otp", {
           userId: this.$store.state.auth.credentials.userInfo.id,
           otp_key: this.otp_key,
         });
 
-        setTimeout(() => {
+        if (response.data.otp_granted) {
+          setTimeout(() => {
+            this.config.loading = false;
+            this.config.success = true;
+          }, 2000);
+          setTimeout(() => {
+            return this.$router.history.push("/homepage");
+          }, 3000);
+        } else {
           this.config.loading = false;
-          this.config.success = true;
-        }, 2000);
-        setTimeout(() => {
-          return this.$router.history.push("/homepage");
-        }, 3000);
+          this.config.error = true;
+        }
       } catch (e) {
         this.config.loading = false;
         console.log(e);
@@ -101,8 +107,8 @@ export default {
         this.$notify({
           group: "auth",
           title: "Failed please try again",
-          type: "error"
-        })
+          type: "error",
+        });
       }
     },
   },

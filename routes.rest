@@ -17,7 +17,7 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "username",
+    "username": "kojiadriano98",
     "password": "pass123"
 }
 
@@ -25,13 +25,13 @@ Content-Type: application/json
 PATCH http://localhost:3000/api/auth/manage_otp/5f4e23ef9ef66301f4269d8d
 
 ###
-POST http://localhost:3000/api/auth/validate_otp/5f44e10c11bf2305631affd8
+POST http://localhost:3000/api/auth/validate_otp/5f51d369334fce0153665b1c
 Content-Type: application/json
 
 {
-    "token": "481153"
+    "otp_token": "598856"
 }
 
 ###
-GET http://localhost:3000/api/auth/generate_otp/5f4e23ef9ef66301f4269d8d
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTkwNTA3MDIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJwYXNzd29yZCI6InBhc3MxMjMiLCJpYXQiOjE1OTkwNDcxMDJ9.f7km-0BKu2x8Egmo6_se45CYO2fI-2hrW9M5LpkcdUY
+GET http://localhost:3000/api/auth/generate_otp/5f51d369334fce0153665b1c
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTkyMDM4MTcsInVzZXJuYW1lIjoia29qaWFkcmlhbm85OCIsInBhc3N3b3JkIjoicGFzczEyMyIsImlhdCI6MTU5OTIwMDIxN30.tCYTMAaY_yi0oHcp9RNRjFpUmDxvwwXN13y6DaQrb5o
